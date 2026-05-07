@@ -88,22 +88,33 @@ def get_prayer_rows():
     return out
 
 
+def _is_email(s):
+    return bool(s and "@" in s and "." in s.split("@")[-1])
+
+
 def get_subscribers():
     """Read subscriber emails from the Subscribers tab. Falls back to env var."""
     fallback = os.environ.get("EMAIL_RECIPIENTS", "jacksonlongyl@gmail.com")
-    fallback_list = [e.strip() for e in fallback.split(",") if e.strip()]
+    fallback_list = [e.strip() for e in fallback.split(",") if _is_email(e.strip())]
     try:
         rows = _get_sheet_values(SUBSCRIBERS_RANGE)
+        print(f"Subscriber sheet rows (including header): {len(rows)}")
+        if len(rows) > 1:
+            print(f"First data row: {rows[1]}")
         if not rows:
+            print("No subscriber rows found, using fallback")
             return fallback_list
         emails = []
         for row in rows[1:]:  # skip header — columns: Timestamp, Name, Email
-            if len(row) >= 3:
-                email = row[2].strip()
-                if email:
-                    emails.append(email)
+            # Find any column that looks like an email address
+            for cell in row:
+                if _is_email(cell.strip()):
+                    emails.append(cell.strip())
+                    break
+        print(f"Found {len(emails)} subscriber(s): {emails}")
         return emails if emails else fallback_list
-    except Exception:
+    except Exception as e:
+        print(f"Error reading subscribers: {e}, using fallback")
         return fallback_list
 
 
