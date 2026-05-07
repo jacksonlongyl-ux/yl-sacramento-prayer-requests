@@ -1,4 +1,26 @@
 {
-  "last_updated": null,
-  "rows": {}
+  "last_updated": "2026-05-07T19:07:02.690239+00:00",
+  "rows": {
+    "4/22/2026 11:49:13": {
+      "had_update": false
+    },
+    "4/22/2026 11:50:17": {
+      "had_update": true
+    },
+    "4/22/2026 12:12:49": {
+      "had_update": true
+    },
+    "5/6/2026 18:32:36": {
+      "had_update": false
+    },
+    "5/6/2026 18:33:17": {
+      "had_update": false
+    },
+    "5/6/2026 18:33:44": {
+      "had_update": false
+    },
+    "5/6/2026 18:35:21": {
+      "had_update": false
+    }
+  }
 }
