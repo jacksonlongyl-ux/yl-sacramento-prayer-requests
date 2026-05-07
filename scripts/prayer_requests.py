@@ -21,12 +21,12 @@ from googleapiclient.discovery import build
 
 # ── Config (all overridable via GitHub secrets) ───────────────────────────────
 
-SPREADSHEET_ID   = os.environ.get("SPREADSHEET_ID",   "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs")
-ORG_NAME         = os.environ.get("ORG_NAME",         "Young Life College Sacramento")
-ORG_TAGLINE      = os.environ.get("ORG_TAGLINE",      "Introducing college students to Jesus and helping them grow in their faith")
-ORG_WEBSITE      = os.environ.get("ORG_WEBSITE",      "https://sacstate.younglife.org/")
-FROM_EMAIL       = os.environ.get("FROM_EMAIL",       "Young Life College Sacramento <prayers@younglifesacramento.com>")
-SUBSCRIBE_FORM_URL = os.environ.get("SUBSCRIBE_FORM_URL", "https://forms.gle/Vm4mhQW92V4ewUng6")
+SPREADSHEET_ID   = os.environ.get("SPREADSHEET_ID")   or "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs"
+ORG_NAME         = os.environ.get("ORG_NAME")         or "Young Life College Sacramento"
+ORG_TAGLINE      = os.environ.get("ORG_TAGLINE")      or "Introducing college students to Jesus and helping them grow in their faith"
+ORG_WEBSITE      = os.environ.get("ORG_WEBSITE")      or "https://sacstate.younglife.org/"
+FROM_EMAIL       = os.environ.get("FROM_EMAIL")       or "Young Life College Sacramento <prayers@younglifesacramento.com>"
+SUBSCRIBE_FORM_URL = os.environ.get("SUBSCRIBE_FORM_URL") or "https://forms.gle/Vm4mhQW92V4ewUng6"
 
 REQUESTS_RANGE = "A:E"
 
