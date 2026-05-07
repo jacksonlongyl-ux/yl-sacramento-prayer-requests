@@ -158,7 +158,7 @@ def _build_email_html(active, newly_updated, date_str):
       </div>"""
         sections += f"""
     <h2 style="color:{YL_PURPLE};margin:28px 0 8px;font-size:18px;">
-      🙌 Praise Reports &amp; Updates
+      Praise Reports &amp; Updates
     </h2>{cards}"""
 
     if active:
@@ -173,12 +173,12 @@ def _build_email_html(active, newly_updated, date_str):
       </div>"""
         sections += f"""
     <h2 style="color:{YL_PURPLE};margin:28px 0 8px;font-size:18px;">
-      🙏 Active Prayer Requests
+      Active Prayer Requests
     </h2>{cards}"""
     else:
         sections += f"""
     <h2 style="color:{YL_PURPLE};margin:28px 0 8px;font-size:18px;">
-      🙏 Active Prayer Requests
+      Active Prayer Requests
     </h2>
     <p style="color:#aaa;font-style:italic;">No open requests this week.</p>"""
 
@@ -191,7 +191,7 @@ def _build_email_html(active, newly_updated, date_str):
 
     <div style="background:{YL_PURPLE};color:white;padding:28px 24px;text-align:center;">
       <div style="font-size:22px;font-weight:700;margin-bottom:4px;">
-        Young Life Sacramento
+        Young Life College Sacramento
       </div>
       <div style="opacity:.8;font-size:14px;">Prayer Requests &nbsp;·&nbsp; {_e(date_str)}</div>
     </div>
@@ -218,8 +218,8 @@ def send_email(html_body, recipients):
     date_str = datetime.now().strftime("%B %d")
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"YL Sacramento Prayer Requests — {date_str}"
-    msg["From"] = f"Young Life Sacramento <{smtp_user}>"
+    msg["Subject"] = f"YL College Sacramento Prayer Requests — {date_str}"
+    msg["From"] = f"Young Life College Sacramento <{smtp_user}>"
     msg["To"] = ", ".join(recipients)
     msg.attach(MIMEText(html_body, "html"))
 
@@ -499,9 +499,9 @@ def build_site():
 
 <header class="site-header">
   <div class="header-inner">
-    <p class="header-eyebrow">Young Life Sacramento</p>
+    <p class="header-eyebrow">Young Life College Sacramento</p>
     <h1 class="header-title">Prayer Requests</h1>
-    <p class="header-subtitle">Praying for our community together</p>
+    <p class="header-subtitle">Introducing college students to Jesus and helping them grow in their faith</p>
   </div>
 </header>
 
@@ -509,7 +509,7 @@ def build_site():
 
   <section class="section">
     <div class="section-header">
-      <div class="section-icon section-icon--pray">🙏</div>
+      <div class="section-icon section-icon--pray"></div>
       <h2 class="section-title">Pray For</h2>
       <span class="section-count">{active_count}</span>
     </div>
@@ -520,7 +520,7 @@ def build_site():
 
   <section class="section">
     <div class="section-header">
-      <div class="section-icon section-icon--update">🙌</div>
+      <div class="section-icon section-icon--update"></div>
       <h2 class="section-title">Updates &amp; Praise</h2>
       <span class="section-count">{update_count}</span>
     </div>
@@ -532,7 +532,7 @@ def build_site():
 </div>
 
 <footer class="site-footer">
-  <a href="https://younglifesacramento.com">younglifesacramento.com</a>
+  <a href="https://younglifesacramento.com">Young Life College Sacramento</a>
   <p class="footer-updated">Last updated {updated_at}</p>
 </footer>
 
