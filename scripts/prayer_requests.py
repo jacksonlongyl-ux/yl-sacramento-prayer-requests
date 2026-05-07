@@ -234,11 +234,21 @@ def send_email(html_body, recipients):
     msg["To"] = ", ".join(recipients)
     msg.attach(MIMEText(html_body, "html"))
 
+    sent, failed = [], []
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
         server.login(smtp_user, smtp_pass)
-        server.sendmail(smtp_user, recipients, msg.as_string())
+        for recipient in recipients:
+            try:
+                msg.replace_header("To", recipient)
+                server.sendmail(smtp_user, [recipient], msg.as_string())
+                sent.append(recipient)
+            except Exception as e:
+                print(f"Failed to send to {recipient}: {e}")
+                failed.append(recipient)
 
-    print(f"Email sent to: {', '.join(recipients)}")
+    print(f"Sent to {len(sent)}: {', '.join(sent)}")
+    if failed:
+        print(f"Failed ({len(failed)}): {', '.join(failed)}")
 
 
 # ── Site builder ──────────────────────────────────────────────────────────────
