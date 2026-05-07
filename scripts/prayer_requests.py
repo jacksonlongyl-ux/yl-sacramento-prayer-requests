@@ -24,7 +24,7 @@ from googleapiclient.discovery import build
 SPREADSHEET_ID = "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs"
 REQUESTS_RANGE = "A:E"
 SUBSCRIBERS_RANGE = "Subscribers!A:B"  # Email, Active (TRUE/FALSE)
-SUBSCRIBE_FORM_URL = os.environ.get("SUBSCRIBE_FORM_URL", "")
+SUBSCRIBE_FORM_URL = os.environ.get("SUBSCRIBE_FORM_URL", "https://forms.gle/Vm4mhQW92V4ewUng6")
 
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(SCRIPTS_DIR, "last_state.json")
