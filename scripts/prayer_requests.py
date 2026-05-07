@@ -13,7 +13,9 @@ import html
 import argparse
 from datetime import datetime, timezone
 
-import resend
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -235,23 +237,26 @@ def _build_email_html(active, newly_updated, date_str):
 
 
 def send_email(html_body, recipients):
-    resend.api_key = os.environ["RESEND_API_KEY"]
+    smtp_user = os.environ["GMAIL_USER"]
+    smtp_pass = os.environ["GMAIL_APP_PASSWORD"]
     date_str = datetime.now().strftime("%B %d")
     subject = f"{ORG_NAME} Prayer Requests — {date_str}"
 
     sent, failed = [], []
-    for recipient in recipients:
-        try:
-            resend.Emails.send({
-                "from": FROM_EMAIL,
-                "to": recipient,
-                "subject": subject,
-                "html": html_body,
-            })
-            sent.append(recipient)
-        except Exception as e:
-            print(f"Failed to send to {recipient}: {e}")
-            failed.append(recipient)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(smtp_user, smtp_pass)
+        for recipient in recipients:
+            try:
+                msg = MIMEMultipart("alternative")
+                msg["Subject"] = subject
+                msg["From"] = f"{ORG_NAME} <{smtp_user}>"
+                msg["To"] = recipient
+                msg.attach(MIMEText(html_body, "html"))
+                server.sendmail(smtp_user, [recipient], msg.as_string())
+                sent.append(recipient)
+            except Exception as e:
+                print(f"Failed to send to {recipient}: {e}")
+                failed.append(recipient)
 
     print(f"Sent to {len(sent)}: {', '.join(sent)}")
     if failed:
