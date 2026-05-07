@@ -93,24 +93,33 @@ def _is_email(s):
 
 
 def get_subscribers():
-    """Read subscriber emails from the Subscribers tab. Falls back to env var."""
+    """Read subscriber emails by scanning all non-first sheets for email addresses."""
     fallback = os.environ.get("EMAIL_RECIPIENTS", "jacksonlongyl@gmail.com")
     fallback_list = [e.strip() for e in fallback.split(",") if _is_email(e.strip())]
     try:
-        rows = _get_sheet_values(SUBSCRIBERS_RANGE)
-        print(f"Subscriber sheet rows (including header): {len(rows)}")
-        if len(rows) > 1:
-            print(f"First data row: {rows[1]}")
-        if not rows:
-            print("No subscriber rows found, using fallback")
-            return fallback_list
+        creds = _get_credentials()
+        service = build("sheets", "v4", credentials=creds)
+
+        # List all tabs in the spreadsheet
+        metadata = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+        sheets = metadata.get("sheets", [])
+        titles = [s["properties"]["title"] for s in sheets]
+        print(f"Sheets found: {titles}")
+
+        # Scan every tab except the first (prayer requests) for email addresses
         emails = []
-        for row in rows[1:]:  # skip header — columns: Timestamp, Name, Email
-            # Find any column that looks like an email address
-            for cell in row:
-                if _is_email(cell.strip()):
-                    emails.append(cell.strip())
-                    break
+        for title in titles[1:]:
+            rows = service.spreadsheets().values().get(
+                spreadsheetId=SPREADSHEET_ID,
+                range=f"'{title}'!A:D",
+            ).execute().get("values", [])
+            for row in rows[1:]:  # skip header
+                for cell in row:
+                    if _is_email(cell.strip()):
+                        emails.append(cell.strip())
+                        break
+
+        emails = list(dict.fromkeys(emails))  # deduplicate, preserve order
         print(f"Found {len(emails)} subscriber(s): {emails}")
         return emails if emails else fallback_list
     except Exception as e:
