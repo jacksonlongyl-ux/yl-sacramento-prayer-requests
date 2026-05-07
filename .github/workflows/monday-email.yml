@@ -26,9 +26,14 @@ jobs:
       - name: Send prayer request email
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          ORG_NAME: ${{ secrets.ORG_NAME }}
+          ORG_TAGLINE: ${{ secrets.ORG_TAGLINE }}
+          ORG_WEBSITE: ${{ secrets.ORG_WEBSITE }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
           EMAIL_RECIPIENTS: ${{ secrets.EMAIL_RECIPIENTS }}
+          SUBSCRIBE_FORM_URL: ${{ secrets.SUBSCRIBE_FORM_URL }}
         run: python scripts/prayer_requests.py send-email
 
       - name: Commit updated state

@@ -26,6 +26,10 @@ jobs:
       - name: Build site
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          ORG_NAME: ${{ secrets.ORG_NAME }}
+          ORG_TAGLINE: ${{ secrets.ORG_TAGLINE }}
+          ORG_WEBSITE: ${{ secrets.ORG_WEBSITE }}
           SUBSCRIBE_FORM_URL: ${{ secrets.SUBSCRIBE_FORM_URL }}
         run: python scripts/prayer_requests.py build-site
 

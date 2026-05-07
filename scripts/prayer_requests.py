@@ -10,35 +10,37 @@ Commands:
 import os
 import json
 import html
-import smtplib
 import argparse
 from datetime import datetime, timezone
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
+import resend
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# ── Config (all overridable via GitHub secrets) ───────────────────────────────
 
-SPREADSHEET_ID = "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs"
-REQUESTS_RANGE = "A:E"
-SUBSCRIBERS_RANGE = "Form_Responses2!A:C"  # Timestamp, Name, Email
+SPREADSHEET_ID   = os.environ.get("SPREADSHEET_ID",   "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs")
+ORG_NAME         = os.environ.get("ORG_NAME",         "Young Life College Sacramento")
+ORG_TAGLINE      = os.environ.get("ORG_TAGLINE",      "Introducing college students to Jesus and helping them grow in their faith")
+ORG_WEBSITE      = os.environ.get("ORG_WEBSITE",      "https://younglifesacramento.com")
+FROM_EMAIL       = os.environ.get("FROM_EMAIL",       "Young Life College Sacramento <prayers@younglifesacramento.com>")
 SUBSCRIBE_FORM_URL = os.environ.get("SUBSCRIBE_FORM_URL", "https://forms.gle/Vm4mhQW92V4ewUng6")
 
+REQUESTS_RANGE = "A:E"
+
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
-STATE_FILE = os.path.join(SCRIPTS_DIR, "last_state.json")
+STATE_FILE  = os.path.join(SCRIPTS_DIR, "last_state.json")
 SITE_OUTPUT = os.path.join(SCRIPTS_DIR, "..", "docs", "index.html")
 
 # Column indices in the sheet
 COL_TIMESTAMP = 0
-COL_NAME = 1
-COL_REQUEST = 2
-COL_ROLE = 3
-COL_UPDATE = 4
+COL_NAME      = 1
+COL_REQUEST   = 2
+COL_ROLE      = 3
+COL_UPDATE    = 4
 
 YL_PURPLE = "#4a235a"
-YL_GREEN = "#27ae60"
+YL_GREEN  = "#27ae60"
 
 
 # ── Google Sheets ─────────────────────────────────────────────────────────────
@@ -211,7 +213,7 @@ def _build_email_html(active, newly_updated, date_str):
 
     <div style="background:{YL_PURPLE};color:white;padding:28px 24px;text-align:center;">
       <div style="font-size:22px;font-weight:700;margin-bottom:4px;">
-        Young Life College Sacramento
+        {_e(ORG_NAME)}
       </div>
       <div style="opacity:.8;font-size:14px;">Prayer Requests &nbsp;·&nbsp; {_e(date_str)}</div>
     </div>
@@ -222,8 +224,8 @@ def _build_email_html(active, newly_updated, date_str):
     <div style="padding:16px 24px 24px;border-top:1px solid #eee;
                 font-size:12px;color:#aaa;text-align:center;">
       Reply to unsubscribe &nbsp;·&nbsp;
-      <a href="https://younglifesacramento.com" style="color:{YL_PURPLE};text-decoration:none;">
-        younglifesacramento.com
+      <a href="{_e(ORG_WEBSITE)}" style="color:{YL_PURPLE};text-decoration:none;">
+        {_e(ORG_WEBSITE.replace('https://','').replace('http://',''))}
       </a>
     </div>
 
@@ -233,27 +235,23 @@ def _build_email_html(active, newly_updated, date_str):
 
 
 def send_email(html_body, recipients):
-    smtp_user = os.environ["GMAIL_USER"]
-    smtp_pass = os.environ["GMAIL_APP_PASSWORD"]
+    resend.api_key = os.environ["RESEND_API_KEY"]
     date_str = datetime.now().strftime("%B %d")
-
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"YL College Sacramento Prayer Requests — {date_str}"
-    msg["From"] = f"Young Life College Sacramento <{smtp_user}>"
-    msg["To"] = ", ".join(recipients)
-    msg.attach(MIMEText(html_body, "html"))
+    subject = f"{ORG_NAME} Prayer Requests — {date_str}"
 
     sent, failed = [], []
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(smtp_user, smtp_pass)
-        for recipient in recipients:
-            try:
-                msg.replace_header("To", recipient)
-                server.sendmail(smtp_user, [recipient], msg.as_string())
-                sent.append(recipient)
-            except Exception as e:
-                print(f"Failed to send to {recipient}: {e}")
-                failed.append(recipient)
+    for recipient in recipients:
+        try:
+            resend.Emails.send({
+                "from": FROM_EMAIL,
+                "to": recipient,
+                "subject": subject,
+                "html": html_body,
+            })
+            sent.append(recipient)
+        except Exception as e:
+            print(f"Failed to send to {recipient}: {e}")
+            failed.append(recipient)
 
     print(f"Sent to {len(sent)}: {', '.join(sent)}")
     if failed:
@@ -312,7 +310,7 @@ def build_site():
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Young Life Sacramento — Prayer Requests</title>
+  <title>{_e(ORG_NAME)} — Prayer Requests</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -564,9 +562,9 @@ def build_site():
 
 <header class="site-header">
   <div class="header-inner">
-    <p class="header-eyebrow">Young Life College Sacramento</p>
+    <p class="header-eyebrow">{_e(ORG_NAME)}</p>
     <h1 class="header-title">Prayer Requests</h1>
-    <p class="header-subtitle">Introducing college students to Jesus and helping them grow in their faith</p>
+    <p class="header-subtitle">{_e(ORG_TAGLINE)}</p>
   </div>
 </header>
 
@@ -605,7 +603,7 @@ def build_site():
 </section>''' if SUBSCRIBE_FORM_URL else ''}
 
 <footer class="site-footer">
-  <a href="https://younglifesacramento.com">Young Life College Sacramento</a>
+  <a href="{_e(ORG_WEBSITE)}">{_e(ORG_NAME)}</a>
   <p class="footer-updated">Last updated {updated_at}</p>
 </footer>
 
