@@ -24,6 +24,7 @@ from googleapiclient.discovery import build
 SPREADSHEET_ID = "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs"
 REQUESTS_RANGE = "A:E"
 SUBSCRIBERS_RANGE = "Subscribers!A:B"  # Email, Active (TRUE/FALSE)
+SUBSCRIBE_FORM_URL = os.environ.get("SUBSCRIBE_FORM_URL", "")
 
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(SCRIPTS_DIR, "last_state.json")
@@ -475,6 +476,41 @@ def build_site():
     }}
 
     /* ── Footer ── */
+    .subscribe-section {{
+      background: var(--purple);
+      color: white;
+      padding: 48px 24px;
+      text-align: center;
+    }}
+    .subscribe-inner {{
+      max-width: 480px;
+      margin: 0 auto;
+    }}
+    .subscribe-title {{
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: 10px;
+    }}
+    .subscribe-body {{
+      font-size: .95rem;
+      opacity: .8;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }}
+    .subscribe-btn {{
+      display: inline-block;
+      background: white;
+      color: var(--purple);
+      font-weight: 600;
+      font-size: .95rem;
+      padding: 12px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity .15s ease;
+    }}
+    .subscribe-btn:hover {{ opacity: .9; }}
+
     .site-footer {{
       border-top: 1px solid var(--border);
       padding: 24px;
@@ -530,6 +566,14 @@ def build_site():
   </section>
 
 </div>
+
+{f'''<section class="subscribe-section">
+  <div class="subscribe-inner">
+    <h2 class="subscribe-title">Pray With Us</h2>
+    <p class="subscribe-body">Get prayer requests delivered to your inbox each morning. Join the team praying for students.</p>
+    <a href="{SUBSCRIBE_FORM_URL}" class="subscribe-btn" target="_blank" rel="noopener">Sign up to pray</a>
+  </div>
+</section>''' if SUBSCRIBE_FORM_URL else ''}
 
 <footer class="site-footer">
   <a href="https://younglifesacramento.com">Young Life College Sacramento</a>
