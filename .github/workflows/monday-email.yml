@@ -2,8 +2,8 @@ name: Send Monday Prayer Email
 
 on:
   schedule:
-    # Every day at 6:00 AM Pacific (13:00 UTC, PDT = UTC-7)
-    - cron: "0 13 * * *"
+    # Every day at 4:00 AM Pacific (11:00 UTC, PDT = UTC-7)
+    - cron: "0 11 * * *"
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:
