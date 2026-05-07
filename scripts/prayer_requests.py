@@ -140,18 +140,31 @@ def load_state():
     return {"rows": {}}
 
 
-def save_state(rows):
-    state = {
-        "last_updated": datetime.now(timezone.utc).isoformat(),
-        "rows": {
-            row["timestamp"]: {"had_update": bool(row["update"])}
-            for row in rows
-            if row["timestamp"]
-        },
-    }
+def save_state(rows, old_state, shown_praise_timestamps):
+    new_rows = {}
+    for row in rows:
+        if not row["timestamp"]:
+            continue
+        has_update = bool(row["update"])
+        old_row = old_state["rows"].get(row["timestamp"], {})
+        old_count = old_row.get("praise_count", 0)
+
+        if row["timestamp"] in shown_praise_timestamps:
+            praise_count = old_count + 1
+        elif not has_update:
+            praise_count = 0  # reset if update is ever removed
+        else:
+            praise_count = old_count
+
+        new_rows[row["timestamp"]] = {
+            "had_update": has_update,
+            "praise_count": praise_count,
+        }
+
+    state = {"last_updated": datetime.now(timezone.utc).isoformat(), "rows": new_rows}
     with open(STATE_FILE, "w") as f:
         json.dump(state, f, indent=2)
-    print(f"State saved ({len(state['rows'])} rows)")
+    print(f"State saved ({len(new_rows)} rows)")
 
 
 # ── Email ─────────────────────────────────────────────────────────────────────
@@ -629,20 +642,24 @@ def cmd_send_email():
 
     active, newly_updated = [], []
     for r in rows:
-        had_update = state["rows"].get(r["timestamp"], {}).get("had_update", False)
+        row_state = state["rows"].get(r["timestamp"], {})
+        had_update = row_state.get("had_update", False)
+        praise_count = row_state.get("praise_count", 0)
         has_update = bool(r["update"])
-        if has_update and not had_update:
+
+        if has_update and (not had_update or praise_count < 2):
             newly_updated.append(r)
         elif not has_update:
             active.append(r)
 
     active.sort(key=lambda r: r["timestamp"])
+    shown_praise_timestamps = {r["timestamp"] for r in newly_updated}
 
     date_str = datetime.now().strftime("%B %d, %Y")
     html_body = _build_email_html(active, newly_updated, date_str)
     recipients = get_subscribers()
     send_email(html_body, recipients)
-    save_state(rows)
+    save_state(rows, state, shown_praise_timestamps)
 
 
 if __name__ == "__main__":
