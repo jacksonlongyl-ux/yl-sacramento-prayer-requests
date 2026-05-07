@@ -22,7 +22,7 @@ from googleapiclient.discovery import build
 # ── Config ────────────────────────────────────────────────────────────────────
 
 SPREADSHEET_ID = "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs"
-REQUESTS_RANGE = "Form_Responses!A:E"
+REQUESTS_RANGE = "A:E"
 SUBSCRIBERS_RANGE = "Subscribers!A:B"  # Email, Active (TRUE/FALSE)
 
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
