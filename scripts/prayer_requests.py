@@ -27,7 +27,7 @@ SUBSCRIBERS_RANGE = "Subscribers!A:B"  # Email, Active (TRUE/FALSE)
 
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(SCRIPTS_DIR, "last_state.json")
-SITE_OUTPUT = os.path.join(SCRIPTS_DIR, "..", "site", "index.html")
+SITE_OUTPUT = os.path.join(SCRIPTS_DIR, "..", "docs", "index.html")
 
 # Column indices in the sheet
 COL_TIMESTAMP = 0
