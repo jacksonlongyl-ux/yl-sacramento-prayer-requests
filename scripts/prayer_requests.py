@@ -23,7 +23,7 @@ from googleapiclient.discovery import build
 
 SPREADSHEET_ID = "1fbNV9-u4x2_V0-O8khYnMoxM5bxaHajuJN706hsygXs"
 REQUESTS_RANGE = "A:E"
-SUBSCRIBERS_RANGE = "Subscribers!A:B"  # Email, Active (TRUE/FALSE)
+SUBSCRIBERS_RANGE = "Form_Responses2!A:C"  # Timestamp, Name, Email
 SUBSCRIBE_FORM_URL = os.environ.get("SUBSCRIBE_FORM_URL", "https://forms.gle/Vm4mhQW92V4ewUng6")
 
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -97,11 +97,10 @@ def get_subscribers():
         if not rows:
             return fallback_list
         emails = []
-        for row in rows[1:]:  # skip header
-            if len(row) >= 1:
-                email = row[0].strip()
-                active = row[1].strip().upper() if len(row) >= 2 else "TRUE"
-                if email and active != "FALSE":
+        for row in rows[1:]:  # skip header — columns: Timestamp, Name, Email
+            if len(row) >= 3:
+                email = row[2].strip()
+                if email:
                     emails.append(email)
         return emails if emails else fallback_list
     except Exception:
