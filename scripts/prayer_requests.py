@@ -140,7 +140,17 @@ def load_state():
     return {"rows": {}}
 
 
+def _fmt_date(ts_str):
+    """Parse sheet timestamp and return e.g. 'April 22, 2026'."""
+    try:
+        dt = datetime.strptime(ts_str, "%m/%d/%Y %H:%M:%S")
+        return dt.strftime("%B %-d, %Y")
+    except Exception:
+        return ts_str
+
+
 def save_state(rows, old_state, shown_praise_timestamps):
+    today = datetime.now(timezone.utc).strftime("%B %-d, %Y")
     new_rows = {}
     for row in rows:
         if not row["timestamp"]:
@@ -149,16 +159,23 @@ def save_state(rows, old_state, shown_praise_timestamps):
         old_row = old_state["rows"].get(row["timestamp"], {})
         old_count = old_row.get("praise_count", 0)
 
+        # Preserve existing update_date; set it the first time we detect an update
+        if has_update and not old_row.get("had_update", False):
+            update_date = today
+        else:
+            update_date = old_row.get("update_date", "")
+
         if row["timestamp"] in shown_praise_timestamps:
             praise_count = old_count + 1
         elif not has_update:
-            praise_count = 0  # reset if update is ever removed
+            praise_count = 0
         else:
             praise_count = old_count
 
         new_rows[row["timestamp"]] = {
             "had_update": has_update,
             "praise_count": praise_count,
+            "update_date": update_date,
         }
 
     state = {"last_updated": datetime.now(timezone.utc).isoformat(), "rows": new_rows}
@@ -186,11 +203,11 @@ def _build_email_html(active, newly_updated, date_str):
         <div style="font-weight:600;margin-bottom:2px;">{_e(r['name'])}</div>
         <div style="font-size:13px;color:#777;margin-bottom:8px;">{_e(r['role'])}</div>
         <div style="font-size:11px;font-weight:700;color:{YL_GREEN};
-                    text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Update</div>
+                    text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Update · {_e(r.get('update_date',''))}</div>
         <div style="line-height:1.6;color:#2d6a4f;">{_e(r['update'])}</div>
         <div style="margin-top:10px;padding-top:10px;border-top:1px solid #c3e6cb;
                     font-size:13px;color:#555;font-style:italic;">
-          Original request: {_e(r['request'])}
+          Original request ({_e(r.get('submitted',''))}): {_e(r['request'])}
         </div>
       </div>"""
         sections += f"""
@@ -207,6 +224,7 @@ def _build_email_html(active, newly_updated, date_str):
         <div style="font-weight:600;margin-bottom:2px;">{_e(r['name'])}</div>
         <div style="font-size:13px;color:#777;margin-bottom:8px;">{_e(r['role'])}</div>
         <div style="line-height:1.6;color:#444;">{_e(r['request'])}</div>
+        <div style="font-size:11px;color:#bbb;margin-top:8px;">Submitted {_e(r.get('submitted',''))}</div>
       </div>"""
         sections += f"""
     <h2 style="color:{YL_PURPLE};margin:28px 0 8px;font-size:18px;">
@@ -279,6 +297,7 @@ def send_email(html_body, recipients):
 # ── Site builder ──────────────────────────────────────────────────────────────
 
 def _prayer_card(r):
+    submitted = _fmt_date(r["timestamp"])
     return f"""
         <div class="card">
           <div class="card-meta">
@@ -286,10 +305,13 @@ def _prayer_card(r):
             {f'<span class="card-role">{_e(r["role"])}</span>' if r['role'] else ''}
           </div>
           <p class="card-text">{_e(r['request'])}</p>
+          <p class="card-date">Submitted {_e(submitted)}</p>
         </div>"""
 
 
 def _update_card(r):
+    submitted = _fmt_date(r["timestamp"])
+    update_date = r.get("update_date", "")
     return f"""
         <div class="card card--update">
           <div class="card-meta">
@@ -297,8 +319,9 @@ def _update_card(r):
             {f'<span class="card-role">{_e(r["role"])}</span>' if r['role'] else ''}
           </div>
           <p class="card-text card-text--muted">{_e(r['request'])}</p>
+          <p class="card-date">Submitted {_e(submitted)}</p>
           <div class="update-block">
-            <span class="update-badge">Update</span>
+            <span class="update-badge">Update{f" · {_e(update_date)}" if update_date else ""}</span>
             <p class="card-text">{_e(r['update'])}</p>
           </div>
         </div>"""
@@ -306,7 +329,11 @@ def _update_card(r):
 
 def build_site():
     rows = get_prayer_rows()
+    state = load_state()
     updated_at = datetime.now(timezone.utc).strftime("%B %d, %Y · %I:%M %p UTC")
+
+    for r in rows:
+        r["update_date"] = state["rows"].get(r["timestamp"], {}).get("update_date", "")
 
     active = sorted(
         [r for r in rows if not r["update"]], key=lambda r: r["timestamp"], reverse=True
@@ -495,6 +522,11 @@ def build_site():
       margin-bottom: 14px;
     }}
 
+    .card-date {{
+      font-size: .75rem;
+      color: #9ca3af;
+      margin-top: 8px;
+    }}
     .update-block {{
       padding-top: 14px;
       border-top: 1px solid #d1fae5;
@@ -646,6 +678,8 @@ def cmd_send_email():
         had_update = row_state.get("had_update", False)
         praise_count = row_state.get("praise_count", 0)
         has_update = bool(r["update"])
+        r["submitted"] = _fmt_date(r["timestamp"])
+        r["update_date"] = row_state.get("update_date", "") or datetime.now(timezone.utc).strftime("%B %-d, %Y")
 
         if has_update and (not had_update or praise_count < 2):
             newly_updated.append(r)
