@@ -1,26 +1,40 @@
 {
-  "last_updated": "2026-05-07T19:57:48.153957+00:00",
+  "last_updated": "2026-05-08T17:17:04.360443+00:00",
   "rows": {
     "4/22/2026 11:49:13": {
-      "had_update": false
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
     },
     "4/22/2026 11:50:17": {
-      "had_update": false
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "May 8, 2026"
     },
     "4/22/2026 12:12:49": {
-      "had_update": false
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "May 8, 2026"
     },
     "5/6/2026 18:32:36": {
-      "had_update": false
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
     },
     "5/6/2026 18:33:17": {
-      "had_update": false
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
     },
     "5/6/2026 18:33:44": {
-      "had_update": false
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
     },
     "5/6/2026 18:35:21": {
-      "had_update": false
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
     }
   }
 }
