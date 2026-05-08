@@ -32,6 +32,9 @@ jobs:
           SUBSCRIBE_FORM_URL: ${{ secrets.SUBSCRIBE_FORM_URL }}
         run: python scripts/prayer_requests.py send-email
 
+      - name: Pull latest before committing state
+        run: git pull --rebase origin main
+
       - name: Commit updated state
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
