@@ -16,6 +16,10 @@ from datetime import datetime, timezone
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+try:
+    import resend as resend_lib
+except ImportError:
+    resend_lib = None
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -268,28 +272,47 @@ def _build_email_html(active, newly_updated, date_str):
 
 
 def send_email(html_body, recipients):
-    smtp_user = os.environ["GMAIL_USER"]
-    smtp_pass = os.environ["GMAIL_APP_PASSWORD"]
     date_str = datetime.now().strftime("%B %d")
     subject = f"{ORG_NAME} Prayer Requests — {date_str}"
+    resend_key = os.environ.get("RESEND_API_KEY")
+    gmail_user = os.environ.get("GMAIL_USER")
+
+    if not resend_key and not gmail_user:
+        raise RuntimeError("No email credentials found. Set RESEND_API_KEY or GMAIL_USER + GMAIL_APP_PASSWORD.")
 
     sent, failed = [], []
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(smtp_user, smtp_pass)
+
+    if resend_key:
+        # ── Resend ────────────────────────────────────────────────────────────
+        resend_lib.api_key = resend_key
+        from_addr = FROM_EMAIL or f"{ORG_NAME} <onboarding@resend.dev>"
         for recipient in recipients:
             try:
-                msg = MIMEMultipart("alternative")
-                msg["Subject"] = subject
-                msg["From"] = f"{ORG_NAME} <{smtp_user}>"
-                msg["To"] = recipient
-                msg.attach(MIMEText(html_body, "html"))
-                server.sendmail(smtp_user, [recipient], msg.as_string())
+                resend_lib.Emails.send({"from": from_addr, "to": recipient,
+                                        "subject": subject, "html": html_body})
                 sent.append(recipient)
             except Exception as e:
                 print(f"Failed to send to {recipient}: {e}")
                 failed.append(recipient)
+    else:
+        # ── Gmail SMTP ────────────────────────────────────────────────────────
+        smtp_pass = os.environ["GMAIL_APP_PASSWORD"]
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(gmail_user, smtp_pass)
+            for recipient in recipients:
+                try:
+                    msg = MIMEMultipart("alternative")
+                    msg["Subject"] = subject
+                    msg["From"] = f"{ORG_NAME} <{gmail_user}>"
+                    msg["To"] = recipient
+                    msg.attach(MIMEText(html_body, "html"))
+                    server.sendmail(gmail_user, [recipient], msg.as_string())
+                    sent.append(recipient)
+                except Exception as e:
+                    print(f"Failed to send to {recipient}: {e}")
+                    failed.append(recipient)
 
-    print(f"Sent to {len(sent)}: {', '.join(sent)}")
+    print(f"Sent ({len(sent)}): {', '.join(sent)}")
     if failed:
         print(f"Failed ({len(failed)}): {', '.join(failed)}")
 
