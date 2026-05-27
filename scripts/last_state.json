@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-26T14:21:56.156745+00:00",
+  "last_updated": "2026-05-27T11:00:23.872047+00:00",
   "rows": {
     "4/22/2026 11:49:13": {
       "had_update": false,
@@ -67,6 +67,11 @@
       "update_date": ""
     },
     "5/19/2026 9:34:10": {
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
+    },
+    "5/26/2026 7:24:02": {
       "had_update": false,
       "praise_count": 0,
       "update_date": ""
