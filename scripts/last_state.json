@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-13T11:01:02.349017+00:00",
+  "last_updated": "2026-07-16T11:01:00.268168+00:00",
   "rows": {
     "4/22/2026 11:49:13": {
       "had_update": false,
@@ -42,9 +42,9 @@
       "update_date": ""
     },
     "5/8/2026 10:20:13": {
-      "had_update": false,
-      "praise_count": 0,
-      "update_date": ""
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "July 16, 2026"
     },
     "5/8/2026 10:22:07": {
       "had_update": true,
@@ -72,21 +72,31 @@
       "update_date": "June 2, 2026"
     },
     "5/26/2026 7:24:02": {
-      "had_update": false,
-      "praise_count": 0,
-      "update_date": ""
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "July 16, 2026"
     },
     "6/1/2026 22:20:05": {
-      "had_update": false,
-      "praise_count": 0,
-      "update_date": ""
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "July 16, 2026"
     },
     "6/9/2026 9:47:39": {
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "July 16, 2026"
+    },
+    "6/9/2026 9:49:01": {
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "July 16, 2026"
+    },
+    "7/13/2026 12:19:37": {
       "had_update": false,
       "praise_count": 0,
       "update_date": ""
     },
-    "6/9/2026 9:49:01": {
+    "7/13/2026 12:20:43": {
       "had_update": false,
       "praise_count": 0,
       "update_date": ""
