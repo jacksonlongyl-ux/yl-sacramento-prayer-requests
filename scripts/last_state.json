@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-17T11:00:38.753063+00:00",
+  "last_updated": "2026-08-24T11:00:31.785314+00:00",
   "rows": {
     "4/22/2026 11:50:17": {
       "had_update": true,
@@ -83,20 +83,30 @@
     },
     "7/13/2026 12:19:37": {
       "had_update": true,
-      "praise_count": 1,
+      "praise_count": 2,
       "update_date": "August 17, 2026"
     },
     "7/13/2026 12:20:43": {
       "had_update": true,
-      "praise_count": 1,
+      "praise_count": 2,
       "update_date": "August 17, 2026"
     },
     "8/16/2026 18:45:48": {
+      "had_update": true,
+      "praise_count": 1,
+      "update_date": "August 24, 2026"
+    },
+    "8/16/2026 18:46:57": {
       "had_update": false,
       "praise_count": 0,
       "update_date": ""
     },
-    "8/16/2026 18:46:57": {
+    "8/23/2026 12:30:24": {
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
+    },
+    "8/23/2026 12:31:22": {
       "had_update": false,
       "praise_count": 0,
       "update_date": ""
