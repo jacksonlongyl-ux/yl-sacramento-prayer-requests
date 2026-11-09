@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-02T12:01:18.027044+00:00",
+  "last_updated": "2026-11-09T12:00:54.989298+00:00",
   "rows": {
     "4/22/2026 11:50:17": {
       "had_update": true,
@@ -40,11 +40,6 @@
       "had_update": true,
       "praise_count": 2,
       "update_date": "June 2, 2026"
-    },
-    "5/8/2026 10:24:06": {
-      "had_update": false,
-      "praise_count": 0,
-      "update_date": ""
     },
     "5/19/2026 9:32:45": {
       "had_update": true,
@@ -130,6 +125,21 @@
       "had_update": true,
       "praise_count": 2,
       "update_date": "October 26, 2026"
+    },
+    "11/8/2026 15:06:43": {
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
+    },
+    "11/8/2026 15:07:40": {
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
+    },
+    "11/8/2026 15:10:55": {
+      "had_update": false,
+      "praise_count": 0,
+      "update_date": ""
     }
   }
 }
